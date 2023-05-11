@@ -223,3 +223,7 @@ target/
 local.env
 /.idea/workspace.xml
 /.idea/
+.mvn/
+mvnw
+mvnw.cmd
+
