@@ -1,5 +1,6 @@
 package my.project.fullstackapp.customer;
 
+import my.project.fullstackapp.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class CustomerService {
 
     public Customer getCustomer(Integer customerId) {
         return customerDAO.getCustomerById(customerId)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with id [%s] not found".formatted(customerId)
                 ));
     }
