@@ -1,9 +1,13 @@
 package my.project.fullstackapp.customer;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
+@AllArgsConstructor
 @Entity
 public class Customer {
 
@@ -20,4 +24,10 @@ public class Customer {
 
     @Column(nullable = false)
     private Integer age;
+
+    public Customer(String name, String email, Integer age) {
+        this.name = name;
+        this.email = email;
+        this.age = age;
+    }
 }
