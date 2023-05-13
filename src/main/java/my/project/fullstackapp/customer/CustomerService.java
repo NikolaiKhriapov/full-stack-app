@@ -8,18 +8,18 @@ import java.util.List;
 @Service
 public class CustomerService {
 
-    public final CustomerDAO customerDAO;
+    public final CustomerRepository customerRepository;
 
-    public CustomerService(CustomerDAO customerDAO) {
-        this.customerDAO = customerDAO;
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
     }
 
     public List<Customer> getAllCustomers() {
-        return customerDAO.getAllCustomers();
+        return customerRepository.findAll();
     }
 
     public Customer getCustomer(Integer customerId) {
-        return customerDAO.getCustomerById(customerId)
+        return customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with id [%s] not found".formatted(customerId)
                 ));

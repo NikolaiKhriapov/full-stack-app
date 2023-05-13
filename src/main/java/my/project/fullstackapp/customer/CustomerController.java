@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
+@RestController("api/v1/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -15,12 +15,12 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @GetMapping("api/v1/customers")
+    @GetMapping
     public List<Customer> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
-    @GetMapping("api/v1/customers/{customerId}")
+    @GetMapping("/{customerId}")
     public Customer getCustomer(@PathVariable("customerId") Integer customerId) {
         return customerService.getCustomer(customerId);
     }
