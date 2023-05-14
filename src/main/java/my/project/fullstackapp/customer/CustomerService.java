@@ -68,6 +68,9 @@ public class CustomerService {
     }
 
     public void deleteCustomer(Integer customerId) {
+        if (!customerRepository.existsCustomerById(customerId)) {
+            throw new ResourceNotFoundException("Customer with id [%s] not found".formatted(customerId));
+        }
         customerRepository.deleteById(customerId);
     }
 }
