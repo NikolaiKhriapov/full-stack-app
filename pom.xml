@@ -65,6 +65,11 @@
 			<version>1.17.6</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency><!-- integration testing -->
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
