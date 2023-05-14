@@ -12,14 +12,14 @@ import lombok.RequiredArgsConstructor;
 public class Customer {
 
     @Id
-    @SequenceGenerator(name = "sequence", sequenceName = "sequence")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence")
+    @SequenceGenerator(name = "customer_id_sequence", sequenceName = "customer_id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "customer_id_sequence")
     private Integer id;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)

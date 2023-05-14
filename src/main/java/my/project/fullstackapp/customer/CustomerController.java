@@ -1,18 +1,16 @@
 package my.project.fullstackapp.customer;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("api/v1/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
-
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
-    }
 
     @GetMapping
     public List<Customer> getAllCustomers() {

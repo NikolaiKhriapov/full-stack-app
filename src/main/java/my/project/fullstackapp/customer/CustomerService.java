@@ -1,5 +1,6 @@
 package my.project.fullstackapp.customer;
 
+import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
@@ -8,13 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CustomerService {
 
     public final CustomerRepository customerRepository;
-
-    public CustomerService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
-    }
 
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
