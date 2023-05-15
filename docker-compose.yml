@@ -20,14 +20,3 @@ networks:
 
 volumes:
   db:
-
-#ls
-#docker compose up -d
-#docker compose ps
-
-#docker exec -it postgres bash
-#psql -U postgres
-#\l
-#CREATE DATABASE customer;
-#\l
-#exit

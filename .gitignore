@@ -226,4 +226,4 @@ local.env
 .mvn/
 mvnw
 mvnw.cmd
-
+hints.txt
