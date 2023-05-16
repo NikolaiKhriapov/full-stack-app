@@ -1,5 +1,6 @@
 package my.project.fullstackapp;
 
+import org.junit.jupiter.api.AfterAll;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -18,6 +19,11 @@ public abstract class AbstractTestcontainersTest {
                     .withDatabaseName("project-dao-unit-test")
                     .withUsername("postgres")
                     .withPassword("1478236950");
+
+    @AfterAll
+    public static void cleanup() {
+        postgreSQLContainer.stop();
+    }
 
     @DynamicPropertySource
     private static void registerDataSourceProperties(DynamicPropertyRegistry registry) {
