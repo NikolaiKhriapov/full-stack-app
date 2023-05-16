@@ -3,6 +3,7 @@ services:
     container_name: postgres
     image: postgres
     environment:
+      POSTGRES_DB: customer
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1478236950
       PGDATA: /data/postgres
@@ -11,6 +12,18 @@ services:
     ports:
       - "5433:5432"
     networks:
+      - db
+    restart: unless-stopped
+  full-stack-app-api:
+    container_name: full-stack-app
+    image: kolyakhryapov/full-stack-app-api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+    ports:
+      - "8080:8081"
+    networks:
+      - db
+    depends_on:
       - db
     restart: unless-stopped
 
