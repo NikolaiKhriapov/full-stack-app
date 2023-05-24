@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,7 +20,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
 
-    private CustomerService underTest;
     @Mock
     private CustomerRepository customerRepository;
 
@@ -37,13 +37,18 @@ class CustomerServiceTest {
         verify(customerRepository).findAll();
     }
 
+    private static final Random RANDOM = new Random();
+
+    private CustomerService underTest;
+
     @Test
     void createCustomer() {
         // Given
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(
                 "Nikolai",
                 "nikolai@gmail.com",
-                27
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
         );
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(false);
 
@@ -58,6 +63,7 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getName()).isEqualTo(request.name());
         assertThat(argument.getValue().getEmail()).isEqualTo(request.email());
         assertThat(argument.getValue().getAge()).isEqualTo(request.age());
+        assertThat(argument.getValue().getGender()).isEqualTo(request.gender());
     }
 
     @Test
@@ -66,7 +72,8 @@ class CustomerServiceTest {
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(
                 "Nikolai",
                 "nikolai@gmail.com",
-                27
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
         );
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(true);
 
@@ -82,7 +89,13 @@ class CustomerServiceTest {
     void getCustomer() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer(customerId, "Nikolai", "nikolai@gmail.com", 28);
+        Customer customer = new Customer(
+                customerId,
+                "Nikolai",
+                "nikolai@gmail.com",
+                28,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         // When
@@ -109,10 +122,20 @@ class CustomerServiceTest {
     void canUpdateAllCustomerFields() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        CustomerUpdateRequest request = new CustomerUpdateRequest("Nikolai1", "nikolai1@gmail.com",27);
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                "Nikolai1",
+                "nikolai1@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(false);
 
         // When
@@ -124,16 +147,26 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getName()).isEqualTo(request.name());
         assertThat(argument.getValue().getEmail()).isEqualTo(request.email());
         assertThat(argument.getValue().getAge()).isEqualTo(request.age());
+        assertThat(argument.getValue().getGender()).isEqualTo(request.gender());
     }
 
     @Test
     void willThrowExceptionWhenEmailExistsWhileUpdateCustomer() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        CustomerUpdateRequest request = new CustomerUpdateRequest(null, "nikolai1@gmail.com",null);
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                null,
+                "nikolai1@gmail.com",
+                null,
+                null);
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(true);
 
         // When
@@ -148,10 +181,20 @@ class CustomerServiceTest {
     void canUpdateOnlyCustomerName() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        CustomerUpdateRequest request = new CustomerUpdateRequest("Nikolai1", null,null);
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                "Nikolai1",
+                null,
+                null,
+                null
+        );
 
         // When
         underTest.updateCustomer(customerId, request);
@@ -162,16 +205,27 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getName()).isEqualTo(request.name());
         assertThat(argument.getValue().getEmail()).isEqualTo(customer.getEmail());
         assertThat(argument.getValue().getAge()).isEqualTo(customer.getAge());
+        assertThat(argument.getValue().getGender()).isEqualTo(customer.getGender());
     }
 
     @Test
     void canUpdateOnlyCustomerEmail() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        CustomerUpdateRequest request = new CustomerUpdateRequest(null, "nikolai1@gmail.com",null);
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                null,
+                "nikolai1@gmail.com",
+                null,
+                null
+        );
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(false);
 
         // When
@@ -183,16 +237,26 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getName()).isEqualTo(customer.getName());
         assertThat(argument.getValue().getEmail()).isEqualTo(request.email());
         assertThat(argument.getValue().getAge()).isEqualTo(customer.getAge());
+        assertThat(argument.getValue().getGender()).isEqualTo(customer.getGender());
     }
 
     @Test
     void canUpdateOnlyCustomerAge() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        CustomerUpdateRequest request = new CustomerUpdateRequest(null, null,30);
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                null,
+                null,
+                30,
+                null);
 
         // When
         underTest.updateCustomer(customerId, request);
@@ -203,17 +267,26 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getName()).isEqualTo(customer.getName());
         assertThat(argument.getValue().getEmail()).isEqualTo(customer.getEmail());
         assertThat(argument.getValue().getAge()).isEqualTo(request.age());
+        assertThat(argument.getValue().getGender()).isEqualTo(customer.getGender());
     }
 
     @Test
     void willThrowExceptionWhenNoChangesWhileUpdateCustomer() {
         // Given
         Integer customerId = 10;
-        Customer customer = new Customer("Nikolai","nikolai@gmail.com",27);
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
         CustomerUpdateRequest request = new CustomerUpdateRequest(
-                customer.getName(), customer.getEmail(),customer.getAge()
+                customer.getName(),
+                customer.getEmail(),
+                customer.getAge(),
+                customer.getGender()
         );
 
         // When

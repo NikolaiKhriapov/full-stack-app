@@ -1,7 +1,5 @@
 const UserProfile = ({name, age, gender, imageNumber, ...props}) => {
 
-    gender = gender === "MALE" ? "men" : "women"
-
     return (
         <div>
             <h1>{name}</h1>

@@ -26,10 +26,6 @@ class CustomerControllerTest {
     private final Faker FAKER = new Faker();
     private final Random RANDOM = new Random();
 
-//    @Test
-//    void getAllCustomers() {
-//    }
-
     @Test
     void registerCustomer() {
         // create registration request
@@ -37,7 +33,8 @@ class CustomerControllerTest {
         String name = fakerName.fullName();
         String email = fakerName.firstName() + "." + fakerName.lastName() + "@foobar.com";
         Integer age = RANDOM.nextInt(18, 100);
-        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age);
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age, gender);
 
         // send a POST request
         webTestClient.post()
@@ -60,7 +57,7 @@ class CustomerControllerTest {
                 .getResponseBody();
 
         // make sure that customer is present
-        Customer expectedCustomer = new Customer(name, email, age);
+        Customer expectedCustomer = new Customer(name, email, age, gender);
         assertThat(allCustomers)
                 .usingRecursiveFieldByFieldElementComparatorIgnoringFields("id")
                 .contains(expectedCustomer);
@@ -83,10 +80,6 @@ class CustomerControllerTest {
                 .isEqualTo(expectedCustomer);
     }
 
-//    @Test
-//    void getCustomer() {
-//    }
-
     @Test
     void updateCustomer() {
         // create registration request
@@ -94,7 +87,8 @@ class CustomerControllerTest {
         String name = fakerName.fullName();
         String email = fakerName.firstName() + "." + fakerName.lastName() + "@foobar.com";
         Integer age = RANDOM.nextInt(18, 100);
-        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age);
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age, gender);
 
         // send a POST request
         webTestClient.post()
@@ -125,10 +119,11 @@ class CustomerControllerTest {
 
         // update customer
         Name fakerNameNew = FAKER.name();
-        String nameNew = fakerName.fullName();
-        String emailNew = fakerName.firstName() + "." + fakerName.lastName() + "@foobar.com";
+        String nameNew = fakerNameNew.fullName();
+        String emailNew = fakerNameNew.firstName() + "." + fakerNameNew.lastName() + "@foobar.com";
         Integer ageNew = RANDOM.nextInt(18, 100);
-        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(nameNew, emailNew, ageNew);
+        Gender genderNew = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(nameNew, emailNew, ageNew, genderNew);
 
         webTestClient.put()
                 .uri(CUSTOMERS_URI + "/{id}", customerId)
@@ -148,7 +143,7 @@ class CustomerControllerTest {
                 .returnResult()
                 .getResponseBody();
 
-        Customer expectedCustomer = new Customer(customerId, nameNew, emailNew, ageNew);
+        Customer expectedCustomer = new Customer(customerId, nameNew, emailNew, ageNew, genderNew);
         assertThat(updatedCustomer).isEqualTo(expectedCustomer);
     }
 
@@ -159,7 +154,8 @@ class CustomerControllerTest {
         String name = fakerName.fullName();
         String email = fakerName.firstName() + "." + fakerName.lastName() + "@foobar.com";
         Integer age = RANDOM.nextInt(18, 100);
-        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age);
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+        CustomerRegistrationRequest request = new CustomerRegistrationRequest(name, email, age, gender);
 
         // send a POST request
         webTestClient.post()
