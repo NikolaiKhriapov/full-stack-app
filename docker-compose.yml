@@ -26,6 +26,16 @@ services:
     depends_on:
       - db
     restart: unless-stopped
+  full-stack-app-react:
+    container_name: full-stack-app-react
+    image: kolyakhryapov/full-stack-app-react
+    build:
+      context: frontend/vite-project
+    ports:
+      - "3000:5173"
+    depends_on:
+      - full-stack-app-api
+    restart: unless-stopped
 
 networks:
   db:

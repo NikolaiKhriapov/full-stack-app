@@ -1,0 +1,21 @@
+import {createStandaloneToast, defineStyle} from '@chakra-ui/react'
+
+const {toast} = createStandaloneToast()
+
+const notification = (title, description, status) => {
+    toast({
+        title,
+        description,
+        status,
+        isClosable: true,
+        duration: 4 * 1000
+    })
+}
+
+export const successNotification = (title, description) => {
+    notification(title, description, "success")
+}
+
+export const errorNotification = (title, description) => {
+    notification(title, description, "error")
+}
