@@ -23,7 +23,7 @@ class CustomerControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    private final String CUSTOMERS_URI = "api/v1/customers";
+    private final String CUSTOMERS_PATH = "api/v1/customers";
     private final Faker FAKER = new Faker();
     private final Random RANDOM = new Random();
 
@@ -40,7 +40,7 @@ class CustomerControllerTest {
 
         // send a POST request
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(request), CustomerRegistrationRequest.class)
@@ -51,7 +51,7 @@ class CustomerControllerTest {
 
         // get all customers
         List<CustomerDTO> allCustomers = webTestClient.get()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -74,7 +74,7 @@ class CustomerControllerTest {
         assertThat(allCustomers).contains(expectedCustomer);
 
         webTestClient.get()
-                .uri(CUSTOMERS_URI + "/{id}", customerId)
+                .uri(CUSTOMERS_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -98,7 +98,7 @@ class CustomerControllerTest {
 
         // send a POST request
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(request), CustomerRegistrationRequest.class)
@@ -109,7 +109,7 @@ class CustomerControllerTest {
 
         // get all customers
         List<CustomerDTO> allCustomers = webTestClient.get()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -134,7 +134,7 @@ class CustomerControllerTest {
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(nameNew, email, password, ageNew, genderNew);
 
         webTestClient.put()
-                .uri(CUSTOMERS_URI + "/{id}", customerId)
+                .uri(CUSTOMERS_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -144,7 +144,7 @@ class CustomerControllerTest {
 
         // get customer by id
         CustomerDTO updatedCustomer = webTestClient.get()
-                .uri(CUSTOMERS_URI + "/{id}", customerId)
+                .uri(CUSTOMERS_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -172,7 +172,7 @@ class CustomerControllerTest {
 
         // send a POST request to create customer 1
         webTestClient.post()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(request1), CustomerRegistrationRequest.class)
@@ -181,7 +181,7 @@ class CustomerControllerTest {
 
         // send a POST request to create customer 2
         String jwtToken = webTestClient.post()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(Mono.just(request2), CustomerRegistrationRequest.class)
@@ -192,7 +192,7 @@ class CustomerControllerTest {
 
         // get all customers
         List<Customer> allCustomers = webTestClient.get()
-                .uri(CUSTOMERS_URI)
+                .uri(CUSTOMERS_PATH)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -211,7 +211,7 @@ class CustomerControllerTest {
 
         // customer 2 deletes customer 1
         webTestClient.delete()
-                .uri(CUSTOMERS_URI + "/{id}", customerId)
+                .uri(CUSTOMERS_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
@@ -219,7 +219,7 @@ class CustomerControllerTest {
 
         // customer 2 gets customer 1 by id
         webTestClient.get()
-                .uri(CUSTOMERS_URI + "/{id}", customerId)
+                .uri(CUSTOMERS_PATH + "/{id}", customerId)
                 .accept(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()

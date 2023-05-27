@@ -27,7 +27,7 @@ public class SecurityFilterChainConfig {
                 .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests()
-                .requestMatchers("*", "/api/v1/customers")
+                .requestMatchers("*", "/api/v1/customers", "/api/v1/auth/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
