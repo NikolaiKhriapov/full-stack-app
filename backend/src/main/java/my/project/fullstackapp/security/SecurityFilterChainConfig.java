@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -27,7 +28,7 @@ public class SecurityFilterChainConfig {
                 .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests()
-                .requestMatchers("*", "/api/v1/customers", "/api/v1/auth/login")
+                .requestMatchers(HttpMethod.POST, "/api/v1/customers", "/api/v1/auth/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
