@@ -4,18 +4,25 @@ import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
 
-    public final CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
+    private final CustomerDTOMapper customerDTOMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll();
+    public List<CustomerDTO> getAllCustomers() {
+        return customerRepository.findAll()
+                .stream()
+                .map(customerDTOMapper)
+                .collect(Collectors.toList());
     }
 
     public void createCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
@@ -26,6 +33,7 @@ public class CustomerService {
         Customer customer = new Customer(
                 customerRegistrationRequest.name(),
                 customerRegistrationRequest.email(),
+                passwordEncoder.encode(customerRegistrationRequest.password()),
                 customerRegistrationRequest.age(),
                 customerRegistrationRequest.gender()
         );
@@ -33,15 +41,19 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    public Customer getCustomer(Integer customerId) {
+    public CustomerDTO getCustomer(Integer customerId) {
         return customerRepository.findById(customerId)
+                .map(customerDTOMapper)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Customer with id [%s] not found".formatted(customerId)
                 ));
     }
 
     public void updateCustomer(Integer customerId, CustomerUpdateRequest customerUpdateRequest) {
-        Customer customer = getCustomer(customerId);
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Customer with id [%s] not found".formatted(customerId)
+                ));
 
         boolean changes = false;
 
