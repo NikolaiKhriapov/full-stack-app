@@ -19,7 +19,9 @@ public class AuthenticationController {
     public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
         AuthenticationResponse response = authenticationService.login(request);
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, response.token())
+                .header(
+                        HttpHeaders.AUTHORIZATION,
+                        response.token())
                 .body(response);
     }
 }

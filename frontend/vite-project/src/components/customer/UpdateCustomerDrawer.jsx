@@ -11,7 +11,6 @@ import {
 } from "@chakra-ui/react";
 import UpdateCustomerForm from "./UpdateCustomerForm.jsx";
 
-const AddIcon = () => "+";
 const CloseIcon = () => "x";
 
 const UpdateCustomerDrawer = ({fetchCustomers, initialValues, customerId}) => {

@@ -1,8 +1,8 @@
 import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
-import {saveCustomer} from "../services/client.js";
-import {successNotification, errorNotification} from "../services/notification.js";
+import {createCustomer} from "../../services/client.js";
+import {successNotification, errorNotification} from "../../services/notification.js";
 
 const MyTextInput = ({label, ...props}) => {
     // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
@@ -75,7 +75,7 @@ const CreateCustomerForm = ({fetchCustomers}) => {
                 })}
                 onSubmit={(customer, {setSubmitting}) => {
                     setSubmitting(true);
-                    saveCustomer(customer)
+                    createCustomer(customer)
                         .then((response) => {
                             console.log(response)
                             successNotification(
@@ -106,7 +106,7 @@ const CreateCustomerForm = ({fetchCustomers}) => {
                             />
 
                             <MyTextInput
-                                label="Email Address"
+                                label="Email"
                                 name="email"
                                 type="email"
                                 placeholder="jane@formik.com"
@@ -115,7 +115,7 @@ const CreateCustomerForm = ({fetchCustomers}) => {
                             <MyTextInput
                                 label="Password"
                                 name="password"
-                                type="text"
+                                type="password"
                                 placeholder="password"
                             />
 
