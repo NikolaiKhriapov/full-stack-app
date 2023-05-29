@@ -1,36 +1,12 @@
 import React from 'react';
 import {
-    IconButton,
-    Avatar,
-    Box,
-    CloseButton,
-    Flex,
-    HStack,
-    VStack,
-    Icon,
-    useColorModeValue,
-    Link,
-    Drawer,
-    DrawerContent,
-    Text,
-    useDisclosure,
-    Menu,
-    MenuButton,
-    MenuDivider,
-    MenuItem,
-    MenuList,
-    Image
+    IconButton, Avatar, Box, CloseButton, Flex, HStack, VStack, Icon, useColorModeValue, Drawer, DrawerContent, Text,
+    useDisclosure, Menu, MenuButton, MenuDivider, MenuItem, MenuList,
 } from '@chakra-ui/react';
 import {
-    FiHome,
-    FiTrendingUp,
-    FiCompass,
-    FiStar,
-    FiSettings,
-    FiMenu,
-    FiBell,
-    FiChevronDown,
+    FiHome, FiTrendingUp, FiCompass, FiStar, FiSettings, FiMenu, FiBell, FiChevronDown,
 } from 'react-icons/fi';
+import {useAuth} from "../components/context/AuthContext.jsx";
 
 const LinkItems = [
     {name: 'Home', icon: FiHome},
@@ -60,7 +36,6 @@ export default function SidebarWithHeader({children}) {
                     <SidebarContent onClose={onClose}/>
                 </DrawerContent>
             </Drawer>
-            {/* mobilenav */}
             <MobileNav onOpen={onOpen}/>
             <Box ml={{base: 0, md: 60}} p="4">
                 {children}
@@ -80,16 +55,11 @@ const SidebarContent = ({onClose, ...rest}) => {
             pos="fixed"
             h="full"
             {...rest}>
-            <Flex h="20" flexDirection="column" alignItems="center" mx="8" mb={50} mt={3} justifyContent="space-between">
+            <Flex flexDirection="column" alignItems="center" mt={5} mb={6}
+                  justifyContent="space-between">
                 <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
                     Dashboard
                 </Text>
-                <Image
-                    borderRadius="full"
-                    boxSize="75px"
-                    src="https://user-images.githubusercontent.com/40702606/210880158-e7d698c2-b19a-4057-b415-09f48a746753.png"
-                    alt="Amigoscode"
-                />
                 <CloseButton display={{base: 'flex', md: 'none'}} onClick={onClose}/>
             </Flex>
             {LinkItems.map((link) => (
@@ -103,36 +73,39 @@ const SidebarContent = ({onClose, ...rest}) => {
 
 const NavItem = ({icon, children, ...rest}) => {
     return (
-        <Link href="#" style={{textDecoration: 'none'}} _focus={{boxShadow: 'none'}}>
-            <Flex
-                align="center"
-                p="4"
-                mx="4"
-                borderRadius="lg"
-                role="group"
-                cursor="pointer"
-                _hover={{
-                    bg: 'red.400',
-                    color: 'white',
-                }}
-                {...rest}>
-                {icon && (
-                    <Icon
-                        mr="4"
-                        fontSize="16"
-                        _groupHover={{
-                            color: 'white',
-                        }}
-                        as={icon}
-                    />
-                )}
-                {children}
-            </Flex>
-        </Link>
+        // <Link href="#" style={{textDecoration: 'none'}} _focus={{boxShadow: 'none'}}>
+        <Flex
+            align="center"
+            p="4"
+            mx="4"
+            borderRadius="lg"
+            role="group"
+            cursor="pointer"
+            _hover={{
+                bg: 'red.400',
+                color: 'white',
+            }}
+            {...rest}>
+            {icon && (
+                <Icon
+                    mr="4"
+                    fontSize="16"
+                    _groupHover={{
+                        color: 'white',
+                    }}
+                    as={icon}
+                />
+            )}
+            {children}
+        </Flex>
+        // </Link>
     );
 };
 
 const MobileNav = ({onOpen, ...rest}) => {
+
+    const {logOut, customer} = useAuth();
+
     return (
         <Flex
             ml={{base: 0, md: 60}}
@@ -185,10 +158,12 @@ const MobileNav = ({onOpen, ...rest}) => {
                                     alignItems="flex-start"
                                     spacing="1px"
                                     ml="2">
-                                    <Text fontSize="sm">Justina Clark</Text>
-                                    <Text fontSize="xs" color="gray.600">
-                                        Admin
-                                    </Text>
+                                    <Text fontSize="sm">{customer?.username}</Text>
+                                    {customer?.roles.map((role, id) => (
+                                        <Text key={id} fontSize="xs" color="gray.600">
+                                            {role}
+                                        </Text>
+                                    ))}
                                 </VStack>
                                 <Box display={{base: 'none', md: 'flex'}}>
                                     <FiChevronDown/>
@@ -202,7 +177,9 @@ const MobileNav = ({onOpen, ...rest}) => {
                             <MenuItem>Settings</MenuItem>
                             <MenuItem>Billing</MenuItem>
                             <MenuDivider/>
-                            <MenuItem>Sign out</MenuItem>
+                            <MenuItem onClick={logOut}>
+                                Log out
+                            </MenuItem>
                         </MenuList>
                     </Menu>
                 </Flex>

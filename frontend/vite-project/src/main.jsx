@@ -7,6 +7,7 @@ import {ChakraProvider} from '@chakra-ui/react'
 import {createStandaloneToast} from '@chakra-ui/react'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import './index.css'
+import ProtectedRoute from "./shared/ProtectedRoute.js";
 
 const {ToastContainer} = createStandaloneToast()
 
@@ -16,8 +17,8 @@ const router = createBrowserRouter([
         element: <Login/>,
     },
     {
-        path: "dashboard",
-        element: <App/>
+        path: "/dashboard",
+        element: <ProtectedRoute><App/></ProtectedRoute>
     }
 ])
 
