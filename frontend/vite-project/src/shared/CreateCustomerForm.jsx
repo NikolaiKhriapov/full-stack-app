@@ -1,8 +1,8 @@
 import {Formik, Form, useField} from 'formik';
 import * as Yup from 'yup';
 import {Alert, AlertIcon, Box, Button, FormLabel, Input, Select, Stack} from "@chakra-ui/react";
-import {createCustomer} from "../../services/client.js";
-import {successNotification, errorNotification} from "../../services/notification.js";
+import {createCustomer} from "../services/client.js";
+import {successNotification, errorNotification} from "../services/notification.js";
 
 const MyTextInput = ({label, ...props}) => {
     // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
@@ -40,7 +40,7 @@ const MySelect = ({label, ...props}) => {
 };
 
 // And now we can use these
-const CreateCustomerForm = ({fetchCustomers}) => {
+const CreateCustomerForm = ({onSuccess}) => {
     return (
         <>
             <Formik
@@ -82,7 +82,7 @@ const CreateCustomerForm = ({fetchCustomers}) => {
                                 "Customer saved",
                                 `${customer.name} was successfully saved`
                             )
-                            fetchCustomers();
+                            onSuccess(response.headers["authorization"]);
                         }).catch((error) => {
                         console.log(error)
                         errorNotification(

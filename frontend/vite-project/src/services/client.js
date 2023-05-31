@@ -22,7 +22,7 @@ export const createCustomer = async (customer) => {
         return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers`,
             customer,
-            getAuthConfig()
+            // getAuthConfig()
         )
     } catch (error) {
         throw error;
@@ -52,7 +52,7 @@ export const deleteCustomer = async (customerId) => {
     }
 }
 
-export const login = async (usernameAndPassword) => {
+export const signIn = async (usernameAndPassword) => {
     try {
         return await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/login`,

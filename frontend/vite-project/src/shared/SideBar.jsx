@@ -104,7 +104,7 @@ const NavItem = ({icon, children, ...rest}) => {
 
 const MobileNav = ({onOpen, ...rest}) => {
 
-    const {logOut, customer} = useAuth();
+    const {signOut, customer} = useAuth();
 
     return (
         <Flex
@@ -177,8 +177,8 @@ const MobileNav = ({onOpen, ...rest}) => {
                             <MenuItem>Settings</MenuItem>
                             <MenuItem>Billing</MenuItem>
                             <MenuDivider/>
-                            <MenuItem onClick={logOut}>
-                                Log out
+                            <MenuItem onClick={signOut}>
+                                Sign Out
                             </MenuItem>
                         </MenuList>
                     </Menu>

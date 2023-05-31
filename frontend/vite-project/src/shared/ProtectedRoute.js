@@ -8,7 +8,7 @@ const ProtectedRoute = ({children}) => {
 
     useEffect(() => {
         if (!isCustomerAuthenticated()) {
-            navigate("/");
+            navigate("/sign-in");
         }
     }, [isCustomerAuthenticated]);
 
