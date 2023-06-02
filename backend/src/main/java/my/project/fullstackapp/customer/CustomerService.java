@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
-import my.project.fullstackapp.filesstorage.FilesStorageService;
+import my.project.fullstackapp.filestorage.FileStorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerDTOMapper customerDTOMapper;
     private final PasswordEncoder passwordEncoder;
-    private final FilesStorageService filesStorageService;
+    private final FileStorageService fileStorageService;
 
     public List<CustomerDTO> getAllCustomers() {
         return customerRepository.findAll()
@@ -108,7 +108,7 @@ public class CustomerService {
             throw new ResourceNotFoundException("Customer profile image not found");
         }
 
-        return filesStorageService.getProfileImage(customerDTO.profileImage());
+        return fileStorageService.getProfileImage(customerDTO.profileImage());
     }
 
     public void updateCustomerProfileImage(Integer customerId, MultipartFile file) {
@@ -119,7 +119,7 @@ public class CustomerService {
 
         try {
             deleteCustomerProfileImage(customer);
-            String profileImage = filesStorageService.putProfileImage(customerId, file.getBytes(), file.getOriginalFilename());
+            String profileImage = fileStorageService.putProfileImage(customerId, file.getBytes(), file.getOriginalFilename());
             customer.setProfileImage(profileImage);
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload profile image", e);

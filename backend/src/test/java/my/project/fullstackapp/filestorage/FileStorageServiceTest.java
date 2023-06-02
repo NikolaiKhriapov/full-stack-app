@@ -1,9 +1,10 @@
-package my.project.fullstackapp.filesstorage;
+package my.project.fullstackapp.filestorage;
 
 import my.project.fullstackapp.exception.ResourceNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,24 +19,29 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class FilesStorageServiceTest {
+class FileStorageServiceTest {
 
-    private FilesStorageService underTest;
+    private FileStorageService underTest;
+    @Mock
+    private FileStorageProperties fileStorageProperties;
 
-    private static final String PROFILE_IMAGE_DIRECTORY = "src/main/resources/static/images/user-%s/profile-image/";
-    private static final String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
     void setUp() {
-        underTest = new FilesStorageService();
+        underTest = new FileStorageService(fileStorageProperties);
     }
 
     @Test
     void getProfileImage() throws IOException {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer id = RANDOM.nextInt(1, 1000);
-        String profileImage = PROFILE_IMAGE_DIRECTORY.formatted(id) + PROFILE_IMAGE_NAME.formatted(id, ".jpg");
+        String profileImage =
+                fileStorageProperties.getProfileImageDirectory().formatted(id) +
+                        fileStorageProperties.getProfileImageName().formatted(id, ".jpg");
 
         byte[] profileImageBytes = profileImage.getBytes();
 
@@ -53,8 +59,14 @@ class FilesStorageServiceTest {
     @Test
     void willThrowExceptionWhenGetProfileImage() {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer id = RANDOM.nextInt(1, 1000);
-        String profileImage = PROFILE_IMAGE_DIRECTORY.formatted(id) + PROFILE_IMAGE_NAME.formatted(id, ".jpg");
+
+        String profileImage =
+                fileStorageProperties.getProfileImageDirectory().formatted(id) +
+                        fileStorageProperties.getProfileImageName().formatted(id, ".jpg");
 
         try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
             filesMock.when(() ->
@@ -71,6 +83,9 @@ class FilesStorageServiceTest {
     @Test
     void putProfileImage() throws IOException {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();
         String originalFileName = "test.jpg";
@@ -79,7 +94,9 @@ class FilesStorageServiceTest {
         String profileImagePath = underTest.putProfileImage(customerId, fileBytes, originalFileName);
 
         // Then
-        String expected = PROFILE_IMAGE_DIRECTORY.formatted(customerId) + PROFILE_IMAGE_NAME.formatted(customerId, ".jpg");
+        String expected =
+                fileStorageProperties.getProfileImageDirectory().formatted(customerId) +
+                        fileStorageProperties.getProfileImageName().formatted(customerId, ".jpg");
         assertThat(profileImagePath).isEqualTo(expected);
         assertThat(fileBytes).isEqualTo(Files.readAllBytes(Path.of(expected)));
     }
@@ -87,11 +104,14 @@ class FilesStorageServiceTest {
     @Test
     void willThrowExceptionWhenPutProfileImageCreateDirectories() {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();
         String originalFileName = "test.jpg";
 
-        String profileImageDirectory = PROFILE_IMAGE_DIRECTORY.formatted(customerId);
+        String profileImageDirectory = fileStorageProperties.getProfileImageDirectory().formatted(customerId);
 
         try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
             filesMock.when(() ->
@@ -108,12 +128,15 @@ class FilesStorageServiceTest {
     @Test
     void willThrowExceptionWhenPutProfileImageWrite() {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();
         String originalFileName = "test.jpg";
 
-        String profileImageDirectory = PROFILE_IMAGE_DIRECTORY.formatted(customerId);
-        String profileImageName = PROFILE_IMAGE_NAME.formatted(customerId, ".jpg");
+        String profileImageDirectory = fileStorageProperties.getProfileImageDirectory().formatted(customerId);
+        String profileImageName = fileStorageProperties.getProfileImageName().formatted(customerId, ".jpg");
 
         try (MockedStatic<Files> filesMock = mockStatic(Files.class)) {
             filesMock.when(() ->

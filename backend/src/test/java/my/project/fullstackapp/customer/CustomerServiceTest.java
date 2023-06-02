@@ -3,7 +3,8 @@ package my.project.fullstackapp.customer;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
-import my.project.fullstackapp.filesstorage.FilesStorageService;
+import my.project.fullstackapp.filestorage.FileStorageProperties;
+import my.project.fullstackapp.filestorage.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,15 +34,15 @@ class CustomerServiceTest {
     private PasswordEncoder passwordEncoder;
     private final CustomerDTOMapper customerDTOMapper = new CustomerDTOMapper();
     @Mock
-    private FilesStorageService filesStorageService;
+    private FileStorageService fileStorageService;
+    @Mock
+    private FileStorageProperties fileStorageProperties;
 
-    private static final String PROFILE_IMAGE_DIRECTORY = "src/main/resources/static/images/user-%s/profile-image/";
-    private static final String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomerService(customerRepository, customerDTOMapper, passwordEncoder, filesStorageService);
+        underTest = new CustomerService(customerRepository, customerDTOMapper, passwordEncoder, fileStorageService);
     }
 
     @Test
@@ -424,6 +425,9 @@ class CustomerServiceTest {
     @Test
     void updateCustomerProfileImage() throws IOException {
         // Given
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
+        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+
         Integer customerId = RANDOM.nextInt(1, 1000);
         String name = "Nikolai";
         String email = "nikolai@gmail.com";
@@ -434,9 +438,11 @@ class CustomerServiceTest {
         Customer customer = new Customer(customerId, name, email, password, age, gender);
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        String profileImage = PROFILE_IMAGE_DIRECTORY.formatted(customerId) + PROFILE_IMAGE_NAME.formatted(customerId, ".jpg");
+        String profileImage =
+                fileStorageProperties.getProfileImageDirectory().formatted(customerId) +
+                        fileStorageProperties.getProfileImageName().formatted(customerId, ".jpg");
         MultipartFile multipartFile = new MockMultipartFile("file.jpg", "Hello World".getBytes());
-        when(filesStorageService.putProfileImage(customerId, multipartFile.getBytes(), multipartFile.getOriginalFilename()))
+        when(fileStorageService.putProfileImage(customerId, multipartFile.getBytes(), multipartFile.getOriginalFilename()))
                 .thenReturn(profileImage);
 
         // When
@@ -470,7 +476,7 @@ class CustomerServiceTest {
         // Then
         verify(customerRepository).findById(customerId);
         verifyNoMoreInteractions(customerRepository);
-        verifyNoInteractions(filesStorageService);
+        verifyNoInteractions(fileStorageService);
     }
 
     @Test
@@ -519,7 +525,7 @@ class CustomerServiceTest {
 
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 
-        when(filesStorageService.getProfileImage(customerDTO.profileImage())).thenReturn(profileImageBytes);
+        when(fileStorageService.getProfileImage(customerDTO.profileImage())).thenReturn(profileImageBytes);
 
         // When
         byte[] actualImageBytes = underTest.getCustomerProfileImage(customerId);
@@ -549,6 +555,6 @@ class CustomerServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("Customer profile image not found");
 
-        verifyNoInteractions(filesStorageService);
+        verifyNoInteractions(fileStorageService);
     }
 }

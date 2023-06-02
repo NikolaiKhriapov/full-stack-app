@@ -1,5 +1,6 @@
-package my.project.fullstackapp.filesstorage;
+package my.project.fullstackapp.filestorage;
 
+import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -8,10 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Service
-public class FilesStorageService {
+@RequiredArgsConstructor
+public class FileStorageService {
 
-    private static final String PROFILE_IMAGE_DIRECTORY = "src/main/resources/static/images/user-%s/profile-image/";
-    private static final String PROFILE_IMAGE_NAME = "%s-profile-image%s";
+    private final FileStorageProperties fileStorageProperties;
 
     public byte[] getProfileImage(String profileImageDirectoryAndName) {
         try {
@@ -23,8 +24,8 @@ public class FilesStorageService {
 
     public String putProfileImage(Integer customerId, byte[] fileBytes, String originalFileName) {
 
-        String profileImageDirectory = PROFILE_IMAGE_DIRECTORY.formatted(customerId);
-        String profileImageName = PROFILE_IMAGE_NAME.formatted(customerId, getFileExtension(originalFileName));
+        String profileImageDirectory = fileStorageProperties.getProfileImageDirectory().formatted(customerId);
+        String profileImageName = fileStorageProperties.getProfileImageName().formatted(customerId, getFileExtension(originalFileName));
 
         try {
             Files.createDirectories(Path.of(profileImageDirectory));

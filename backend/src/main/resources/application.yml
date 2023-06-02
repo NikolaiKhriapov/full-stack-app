@@ -30,3 +30,7 @@ spring:
       max-request-size: 10MB
   codec:
     max-in-memory-size: 10MB
+
+file-storage:
+  profile-image-directory: "backend/src/main/resources/static/images/user-%s/profile-image/"
+  profile-image-name: "%s-profile-image%s"
