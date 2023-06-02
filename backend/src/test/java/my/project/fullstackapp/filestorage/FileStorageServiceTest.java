@@ -25,6 +25,8 @@ class FileStorageServiceTest {
     @Mock
     private FileStorageProperties fileStorageProperties;
 
+    private final static String PROFILE_IMAGE_DIRECTORY = "src/test/resources/garbage/static/images/user-%s/profile-image/";
+    private final static String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
@@ -35,8 +37,8 @@ class FileStorageServiceTest {
     @Test
     void getProfileImage() throws IOException {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer id = RANDOM.nextInt(1, 1000);
         String profileImage =
@@ -59,8 +61,8 @@ class FileStorageServiceTest {
     @Test
     void willThrowExceptionWhenGetProfileImage() {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer id = RANDOM.nextInt(1, 1000);
 
@@ -83,8 +85,8 @@ class FileStorageServiceTest {
     @Test
     void putProfileImage() throws IOException {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();
@@ -104,8 +106,8 @@ class FileStorageServiceTest {
     @Test
     void willThrowExceptionWhenPutProfileImageCreateDirectories() {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();
@@ -128,8 +130,8 @@ class FileStorageServiceTest {
     @Test
     void willThrowExceptionWhenPutProfileImageWrite() {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer customerId = RANDOM.nextInt(1, 1000);
         byte[] fileBytes = "This is a test image".getBytes();

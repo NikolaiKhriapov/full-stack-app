@@ -38,6 +38,8 @@ class CustomerServiceTest {
     @Mock
     private FileStorageProperties fileStorageProperties;
 
+    private final static String PROFILE_IMAGE_DIRECTORY = "src/test/resources/garbage/static/images/user-%s/profile-image/";
+    private final static String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
@@ -425,8 +427,8 @@ class CustomerServiceTest {
     @Test
     void updateCustomerProfileImage() throws IOException {
         // Given
-        when(fileStorageProperties.getProfileImageDirectory()).thenReturn("backend/src/main/resources/static/images/user-%s/profile-image/");
-        when(fileStorageProperties.getProfileImageName()).thenReturn("%s-profile-image%s");
+        when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
+        when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
 
         Integer customerId = RANDOM.nextInt(1, 1000);
         String name = "Nikolai";

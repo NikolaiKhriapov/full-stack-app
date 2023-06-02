@@ -1,0 +1,3 @@
+file-storage:
+  profile-image-directory: "src/test/resources/garbage/static/images/user-%s/profile-image/"
+  profile-image-name: "%s-profile-image%s"
