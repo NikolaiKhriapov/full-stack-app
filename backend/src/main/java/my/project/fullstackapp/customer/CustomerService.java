@@ -4,9 +4,15 @@ import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
+import my.project.fullstackapp.filesstorage.FilesStorageService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,12 +23,21 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerDTOMapper customerDTOMapper;
     private final PasswordEncoder passwordEncoder;
+    private final FilesStorageService filesStorageService;
 
     public List<CustomerDTO> getAllCustomers() {
         return customerRepository.findAll()
                 .stream()
                 .map(customerDTOMapper)
                 .collect(Collectors.toList());
+    }
+
+    public CustomerDTO getCustomer(Integer customerId) {
+        return customerRepository.findById(customerId)
+                .map(customerDTOMapper)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Customer with id [%s] not found".formatted(customerId)
+                ));
     }
 
     public void createCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
@@ -41,19 +56,10 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    public CustomerDTO getCustomer(Integer customerId) {
-        return customerRepository.findById(customerId)
-                .map(customerDTOMapper)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Customer with id [%s] not found".formatted(customerId)
-                ));
-    }
-
     public void updateCustomer(Integer customerId, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Customer with id [%s] not found".formatted(customerId)
-                ));
+                        "Customer with id [%s] not found".formatted(customerId)));
 
         boolean changes = false;
 
@@ -85,9 +91,53 @@ public class CustomerService {
     }
 
     public void deleteCustomer(Integer customerId) {
+        checkIfCustomerExistsOrThrow(customerId);
+        customerRepository.deleteById(customerId);
+    }
+
+    private void checkIfCustomerExistsOrThrow(Integer customerId) {
         if (!customerRepository.existsCustomerById(customerId)) {
             throw new ResourceNotFoundException("Customer with id [%s] not found".formatted(customerId));
         }
-        customerRepository.deleteById(customerId);
+    }
+
+    public byte[] getCustomerProfileImage(Integer customerId) {
+        CustomerDTO customerDTO = getCustomer(customerId);
+
+        if (StringUtils.isBlank(customerDTO.profileImage())) {
+            throw new ResourceNotFoundException("Customer profile image not found");
+        }
+
+        return filesStorageService.getProfileImage(customerDTO.profileImage());
+    }
+
+    public void updateCustomerProfileImage(Integer customerId, MultipartFile file) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Customer with id [%s] not found".formatted(customerId)
+                ));
+
+        try {
+            deleteCustomerProfileImage(customer);
+            String profileImage = filesStorageService.putProfileImage(customerId, file.getBytes(), file.getOriginalFilename());
+            customer.setProfileImage(profileImage);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload profile image", e);
+        }
+
+        customerRepository.save(customer);
+    }
+
+    // TODO: cover with tests
+    private void deleteCustomerProfileImage(Customer customer) {
+        if (customer.getProfileImage() != null) {
+            try {
+                Path oldCustomerProfileImage = Path.of(customer.getProfileImage());
+                Files.delete(oldCustomerProfileImage);
+                customer.setProfileImage(null);
+            } catch (IOException e) {
+                throw new RuntimeException(e); // TODO: handle
+            }
+        }
     }
 }

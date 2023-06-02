@@ -3,8 +3,10 @@ package my.project.fullstackapp.customer;
 import lombok.RequiredArgsConstructor;
 import my.project.fullstackapp.jwt.JwtUtil;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -44,5 +46,16 @@ public class CustomerController {
     @DeleteMapping("/{customerId}")
     public void deleteCustomer(@PathVariable("customerId") Integer customerId) {
         customerService.deleteCustomer(customerId);
+    }
+
+    @GetMapping("/{customerId}/profile-image")
+    public byte[] getCustomerProfileImage(@PathVariable("customerId") Integer customerId) {
+        return customerService.getCustomerProfileImage(customerId);
+    }
+
+    @PostMapping(value = "/{customerId}/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void updateCustomerProfileImage(@PathVariable("customerId") Integer customerId,
+                                           @RequestParam("file") MultipartFile file) {
+        customerService.updateCustomerProfileImage(customerId, file);
     }
 }

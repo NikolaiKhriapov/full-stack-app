@@ -8,6 +8,7 @@ public record CustomerDTO (
         String email,
         Integer age,
         Gender gender,
+        String profileImage,
         List<String> roles,
         String username
 ) {

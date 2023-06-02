@@ -3,14 +3,19 @@ package my.project.fullstackapp.customer;
 import my.project.fullstackapp.exception.DuplicateResourceException;
 import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
+import my.project.fullstackapp.filesstorage.FilesStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -22,18 +27,21 @@ import static org.mockito.Mockito.*;
 class CustomerServiceTest {
 
     private CustomerService underTest;
-//    @Mock
     @Mock
     private CustomerRepository customerRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     private final CustomerDTOMapper customerDTOMapper = new CustomerDTOMapper();
+    @Mock
+    private FilesStorageService filesStorageService;
 
+    private static final String PROFILE_IMAGE_DIRECTORY = "src/main/resources/static/images/user-%s/profile-image/";
+    private static final String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomerService(customerRepository, customerDTOMapper, passwordEncoder);
+        underTest = new CustomerService(customerRepository, customerDTOMapper, passwordEncoder, filesStorageService);
     }
 
     @Test
@@ -164,6 +172,31 @@ class CustomerServiceTest {
         assertThat(argument.getValue().getPassword()).isEqualTo(request.password());
         assertThat(argument.getValue().getAge()).isEqualTo(request.age());
         assertThat(argument.getValue().getGender()).isEqualTo(request.gender());
+    }
+
+    @Test
+    void willThrowWhenUpdateCustomerNotFound() {
+        // Given
+        Integer customerId = 10;
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                "Nikolai1",
+                "nikolai1@gmail.com",
+                "password",
+                27,
+                Gender.values()[RANDOM.nextInt(Gender.values().length)]
+        );
+
+        // When
+        assertThatThrownBy(() -> underTest.updateCustomer(customerId, request))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+
+        // Then
+        verify(customerRepository).findById(customerId);
+        verifyNoMoreInteractions(customerRepository);
     }
 
     @Test
@@ -298,6 +331,39 @@ class CustomerServiceTest {
     }
 
     @Test
+    void canUpdateOnlyCustomerGender() {
+        // Given
+        Integer customerId = 10;
+        Customer customer = new Customer(
+                "Nikolai",
+                "nikolai@gmail.com",
+                "password",
+                27,
+                Gender.MALE
+        );
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        CustomerUpdateRequest request = new CustomerUpdateRequest(
+                null,
+                null,
+                null,
+                null,
+                Gender.FEMALE);
+
+        // When
+        underTest.updateCustomer(customerId, request);
+
+        // Then
+        ArgumentCaptor<Customer> argument = ArgumentCaptor.forClass(Customer.class);
+        verify(customerRepository).save(argument.capture());
+        assertThat(argument.getValue().getName()).isEqualTo(customer.getName());
+        assertThat(argument.getValue().getEmail()).isEqualTo(customer.getEmail());
+        assertThat(argument.getValue().getPassword()).isEqualTo(customer.getPassword());
+        assertThat(argument.getValue().getAge()).isEqualTo(customer.getAge());
+        assertThat(argument.getValue().getGender()).isEqualTo(request.gender());
+    }
+
+    @Test
     void willThrowExceptionWhenNoChangesWhileUpdateCustomer() {
         // Given
         Integer customerId = 10;
@@ -353,5 +419,136 @@ class CustomerServiceTest {
 
         // Then
         verify(customerRepository, never()).deleteById(customerId);
+    }
+
+    @Test
+    void updateCustomerProfileImage() throws IOException {
+        // Given
+        Integer customerId = RANDOM.nextInt(1, 1000);
+        String name = "Nikolai";
+        String email = "nikolai@gmail.com";
+        String password = "password";
+        Integer age = 27;
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+
+        Customer customer = new Customer(customerId, name, email, password, age, gender);
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        String profileImage = PROFILE_IMAGE_DIRECTORY.formatted(customerId) + PROFILE_IMAGE_NAME.formatted(customerId, ".jpg");
+        MultipartFile multipartFile = new MockMultipartFile("file.jpg", "Hello World".getBytes());
+        when(filesStorageService.putProfileImage(customerId, multipartFile.getBytes(), multipartFile.getOriginalFilename()))
+                .thenReturn(profileImage);
+
+        // When
+        underTest.updateCustomerProfileImage(customerId, multipartFile);
+
+        // Then
+        ArgumentCaptor<Customer> argument = ArgumentCaptor.forClass(Customer.class);
+        verify(customerRepository).save(argument.capture());
+        assertThat(argument.getValue().getProfileImage()).isEqualTo(profileImage);
+
+        assertThat(argument.getValue().getName()).isEqualTo(name);
+        assertThat(argument.getValue().getEmail()).isEqualTo(email);
+        assertThat(argument.getValue().getPassword()).isEqualTo(password);
+        assertThat(argument.getValue().getAge()).isEqualTo(age);
+        assertThat(argument.getValue().getGender()).isEqualTo(gender);
+    }
+
+    @Test
+    void willThrowWhenUpdateCustomerProfileImageCustomerNotFound() {
+        // Given
+        Integer customerId = RANDOM.nextInt(1, 1000);
+        MultipartFile multipartFile = new MockMultipartFile("file.jpg", "Hello World".getBytes());
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> underTest.updateCustomerProfileImage(customerId, multipartFile))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+
+        // Then
+        verify(customerRepository).findById(customerId);
+        verifyNoMoreInteractions(customerRepository);
+        verifyNoInteractions(filesStorageService);
+    }
+
+    @Test
+    void willThrowWhenUpdateCustomerProfileImageFileNotFound() throws IOException {
+        // Given
+        Integer customerId = RANDOM.nextInt(1, 1000);
+        String name = "Nikolai";
+        String email = "nikolai@gmail.com";
+        String password = "password";
+        Integer age = 27;
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+
+        Customer customer = new Customer(customerId, name, email, password, age, gender);
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        MultipartFile multipartFile = mock(MultipartFile.class);
+        when(multipartFile.getBytes()).thenThrow(IOException.class);
+
+        // When
+        assertThatThrownBy(() -> underTest.updateCustomerProfileImage(customerId, multipartFile))
+                .isInstanceOf(RuntimeException.class)
+                .hasRootCauseInstanceOf(IOException.class)
+                .hasMessage("Failed to upload profile image");
+
+        // Then
+        verify(customerRepository, never()).save(any());
+    }
+
+    @Test
+    void getCustomerProfileImage() {
+        // Given
+        Integer customerId = 10;
+        String name = "Nikolai";
+        String email = "nikolai@gmail.com";
+        String password = "password";
+        String profileImage = "someImage.jpg";
+        Integer age = 28;
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+        byte[] profileImageBytes = "image".getBytes();
+
+        Customer customer =
+                new Customer(customerId, name, email, password, age, gender, profileImage);
+
+        CustomerDTO customerDTO =
+                new CustomerDTO(customerId, name, email, age, gender, profileImage, List.of("ROLE_USER"), email);
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        when(filesStorageService.getProfileImage(customerDTO.profileImage())).thenReturn(profileImageBytes);
+
+        // When
+        byte[] actualImageBytes = underTest.getCustomerProfileImage(customerId);
+
+        // Then
+        assertThat(actualImageBytes).isEqualTo(profileImageBytes);
+    }
+
+    @Test
+    void willThrowWhenGetCustomerProfileImage() {
+        // Given
+        Integer customerId = 10;
+        String name = "Nikolai";
+        String email = "nikolai@gmail.com";
+        String password = "password";
+        Integer age = 28;
+        Gender gender = Gender.values()[RANDOM.nextInt(Gender.values().length)];
+
+        Customer customer =
+                new Customer(customerId, name, email, password, age, gender);
+
+        when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+
+        // When
+        // Then
+        assertThatThrownBy(() -> underTest.getCustomerProfileImage(customerId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Customer profile image not found");
+
+        verifyNoInteractions(filesStorageService);
     }
 }

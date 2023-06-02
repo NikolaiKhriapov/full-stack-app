@@ -28,7 +28,16 @@ public class SecurityFilterChainConfig {
                 .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST, "/api/v1/customers", "/api/v1/auth/login")
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/api/v1/customers",
+                        "/api/v1/auth/login"
+                )
+                .permitAll()
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/v1/customers/*/profile-image"
+                )
                 .permitAll()
                 .anyRequest()
                 .authenticated()

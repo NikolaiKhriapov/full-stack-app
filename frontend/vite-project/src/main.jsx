@@ -5,7 +5,7 @@ import SignIn from "./components/signin/SignIn.jsx";
 import AuthProvider from "./components/context/AuthContext.jsx";
 import {ChakraProvider} from '@chakra-ui/react'
 import {createStandaloneToast} from '@chakra-ui/react'
-import {createBrowserRouter, Navigate, RouterProvider, useNavigate} from "react-router-dom";
+import {createBrowserRouter, Navigate, RouterProvider} from "react-router-dom";
 import ProtectedRoute from "./shared/ProtectedRoute.js";
 import SignUp from "./components/signup/SignUp.jsx";
 import Home from "./Home.jsx";

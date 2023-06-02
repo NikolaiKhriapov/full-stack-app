@@ -38,6 +38,18 @@ public class Customer implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @Column(unique = true)
+    private String profileImage;
+
+    public Customer(Integer id, String name, String email, String password, Integer age, Gender gender) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.age = age;
+        this.gender = gender;
+    }
+
     public Customer(String name, String email, String password, Integer age, Gender gender) {
         this.name = name;
         this.email = email;
