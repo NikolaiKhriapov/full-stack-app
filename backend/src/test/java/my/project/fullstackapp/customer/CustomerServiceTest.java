@@ -554,7 +554,7 @@ class CustomerServiceTest {
                 new Customer(customerId, name, email, password, age, gender, profileImage);
 
         CustomerDTO customerDTO =
-                new CustomerDTO(customerId, name, email, age, gender, profileImage, List.of("ROLE_USER"), email);
+                new CustomerDTO(customerId, name, email, age, gender, profileImage, List.of("ROLE_USER"));
 
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
 

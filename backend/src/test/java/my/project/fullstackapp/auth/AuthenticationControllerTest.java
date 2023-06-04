@@ -81,13 +81,12 @@ public class AuthenticationControllerTest {
         String jwtToken = result.getResponseHeaders().get(AUTHORIZATION).get(0);
         CustomerDTO customerDTO = result.getResponseBody().customerDTO();
 
-        assertThat(jwtUtil.isTokenValid(jwtToken, customerDTO.username())).isTrue();
+        assertThat(jwtUtil.isTokenValid(jwtToken, customerDTO.email())).isTrue();
 
         assertThat(customerDTO.name()).isEqualTo(name);
         assertThat(customerDTO.email()).isEqualTo(email);
         assertThat(customerDTO.age()).isEqualTo(age);
         assertThat(customerDTO.gender()).isEqualTo(gender);
         assertThat(customerDTO.roles()).isEqualTo(List.of("ROLE_USER"));
-        assertThat(customerDTO.username()).isEqualTo(email);
     }
 }

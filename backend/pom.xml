@@ -78,6 +78,13 @@
             <scope>runtime</scope>
         </dependency>
 
+        <!-- .env -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+
         <!-- testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -209,6 +216,12 @@
                             <tag>latest</tag>
                         </tags>
                     </to>
+                    <extraDirectories>
+                        <paths>
+                            <from>.</from>
+                            <into>.</into>
+                        </paths>
+                    </extraDirectories>
                 </configuration>
             </plugin>
         </plugins>

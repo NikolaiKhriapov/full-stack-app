@@ -78,7 +78,7 @@ class CustomerControllerTest {
 
         // make sure that customer is present
         CustomerDTO expectedCustomer =
-                new CustomerDTO(customerId, name, email, age, gender, null, List.of("ROLE_USER"), email);
+                new CustomerDTO(customerId, name, email, age, gender, null, List.of("ROLE_USER"));
 
         assertThat(allCustomers).contains(expectedCustomer);
 
@@ -163,7 +163,7 @@ class CustomerControllerTest {
                 .returnResult()
                 .getResponseBody();
 
-        CustomerDTO expectedCustomer = new CustomerDTO(customerId, nameNew, email, ageNew, genderNew, null, List.of("ROLE_USER"), email);
+        CustomerDTO expectedCustomer = new CustomerDTO(customerId, nameNew, email, ageNew, genderNew, null, List.of("ROLE_USER"));
         assertThat(updatedCustomer).isEqualTo(expectedCustomer);
     }
 

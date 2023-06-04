@@ -11,9 +11,9 @@ cors:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/customer
-    username: postgres
-    password: 1478236950
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl:auto: update

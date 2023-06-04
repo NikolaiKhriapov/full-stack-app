@@ -9,8 +9,7 @@ public record CustomerDTO (
         Integer age,
         Gender gender,
         String profileImage,
-        List<String> roles,
-        String username
+        List<String> roles
 ) {
 
 }
