@@ -291,7 +291,7 @@ class CustomerControllerTest {
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isCreated();
 
         // Then the profileImage should be populated
         //get profileImage
@@ -311,8 +311,8 @@ class CustomerControllerTest {
         // download customerProfileImage
         byte[] downloadedProfileImage = webTestClient.get()
                 .uri(CUSTOMERS_PATH + "/{customerId}/profile-image", customerDTO.id())
-//                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
-                .accept(MediaType.APPLICATION_JSON)
+                .header(AUTHORIZATION, String.format("Bearer %s", jwtToken))
+                .accept(MediaType.IMAGE_JPEG)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(byte[].class)

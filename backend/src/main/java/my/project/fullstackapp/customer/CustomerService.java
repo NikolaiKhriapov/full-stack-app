@@ -6,6 +6,7 @@ import my.project.fullstackapp.exception.RequestValidationException;
 import my.project.fullstackapp.exception.ResourceNotFoundException;
 import my.project.fullstackapp.filestorage.FileStorageService;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.MessageSource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,6 +26,7 @@ public class CustomerService {
     private final CustomerDTOMapper customerDTOMapper;
     private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
+    private final MessageSource messageSource;
 
     public List<CustomerDTO> getAllCustomers() {
         return customerRepository.findAll()
@@ -35,14 +38,14 @@ public class CustomerService {
     public CustomerDTO getCustomer(Integer customerId) {
         return customerRepository.findById(customerId)
                 .map(customerDTOMapper)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Customer with id [%s] not found".formatted(customerId)
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.customer.notFound", null, Locale.getDefault())));
     }
 
     public void createCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         if (customerRepository.existsCustomerByEmail(customerRegistrationRequest.email())) {
-            throw new DuplicateResourceException("Email already taken");
+            throw new DuplicateResourceException(messageSource.getMessage(
+                    "exception.authentication.emailAlreadyExists", null, Locale.getDefault()));
         }
 
         Customer customer = new Customer(
@@ -58,8 +61,8 @@ public class CustomerService {
 
     public void updateCustomer(Integer customerId, CustomerUpdateRequest customerUpdateRequest) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Customer with id [%s] not found".formatted(customerId)));
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.customer.notFound", null, Locale.getDefault())));
 
         boolean changes = false;
 
@@ -69,7 +72,8 @@ public class CustomerService {
         }
         if (customerUpdateRequest.email() != null && !customerUpdateRequest.email().equals(customer.getEmail())) {
             if (customerRepository.existsCustomerByEmail(customerUpdateRequest.email())) {
-                throw new DuplicateResourceException("Email already taken");
+                throw new DuplicateResourceException(messageSource.getMessage(
+                        "exception.authentication.emailAlreadyExists", null, Locale.getDefault()));
             }
             customer.setEmail(customerUpdateRequest.email());
             changes = true;
@@ -84,7 +88,8 @@ public class CustomerService {
         }
 
         if (!changes) {
-            throw new RequestValidationException("No data changes found");
+            throw new RequestValidationException(messageSource.getMessage(
+                    "exception.customer.noChanges", null, Locale.getDefault()));
         }
 
         customerRepository.save(customer);
@@ -97,7 +102,8 @@ public class CustomerService {
 
     private void checkIfCustomerExistsOrThrow(Integer customerId) {
         if (!customerRepository.existsCustomerById(customerId)) {
-            throw new ResourceNotFoundException("Customer with id [%s] not found".formatted(customerId));
+            throw new ResourceNotFoundException(messageSource.getMessage(
+                    "exception.customer.notFound", null, Locale.getDefault()));
         }
     }
 
@@ -105,7 +111,8 @@ public class CustomerService {
         CustomerDTO customerDTO = getCustomer(customerId);
 
         if (StringUtils.isBlank(customerDTO.profileImage())) {
-            throw new ResourceNotFoundException("Customer profile image not found");
+            throw new ResourceNotFoundException(messageSource.getMessage(
+                    "exception.customer.profileImage.notFound", null, Locale.getDefault()));
         }
 
         return fileStorageService.getProfileImage(customerDTO.profileImage());
@@ -113,16 +120,16 @@ public class CustomerService {
 
     public void updateCustomerProfileImage(Integer customerId, MultipartFile file) {
         Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Customer with id [%s] not found".formatted(customerId)
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException(messageSource.getMessage(
+                        "exception.customer.notFound", null, Locale.getDefault())));
 
         try {
             deleteCustomerProfileImage(customer);
             String profileImage = fileStorageService.putProfileImage(customerId, file.getBytes(), file.getOriginalFilename());
             customer.setProfileImage(profileImage);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to upload profile image", e);
+            throw new RuntimeException(messageSource.getMessage(
+                    "exception.customer.profileImage.notUploaded", null, Locale.getDefault()), e);
         }
 
         customerRepository.save(customer);

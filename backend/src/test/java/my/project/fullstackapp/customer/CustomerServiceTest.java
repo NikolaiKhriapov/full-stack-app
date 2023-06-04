@@ -11,12 +11,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Random;
 
@@ -37,14 +39,22 @@ class CustomerServiceTest {
     private FileStorageService fileStorageService;
     @Mock
     private FileStorageProperties fileStorageProperties;
+    @Mock
+    private MessageSource messageSource;
 
-    private final static String PROFILE_IMAGE_DIRECTORY = "src/test/resources/garbage/static/images/user-%s/profile-image/";
-    private final static String PROFILE_IMAGE_NAME = "%s-profile-image%s";
+    private static final String PROFILE_IMAGE_DIRECTORY = "src/test/resources/garbage/static/images/user-%s/profile-image/";
+    private static final String PROFILE_IMAGE_NAME = "%s-profile-image%s";
     private static final Random RANDOM = new Random();
 
     @BeforeEach
     void setUp() {
-        underTest = new CustomerService(customerRepository, customerDTOMapper, passwordEncoder, fileStorageService);
+        underTest = new CustomerService(
+                customerRepository,
+                customerDTOMapper,
+                passwordEncoder,
+                fileStorageService,
+                messageSource
+        );
     }
 
     @Test
@@ -97,11 +107,13 @@ class CustomerServiceTest {
                 Gender.values()[RANDOM.nextInt(Gender.values().length)]
         );
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(true);
+        when(messageSource.getMessage("exception.authentication.emailAlreadyExists", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         assertThatThrownBy(() -> underTest.createCustomer(request))
                 .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage("Email already taken");
+                .hasMessage("Exception message");
         // Then
         verify(customerRepository, never()).save(any());
     }
@@ -133,13 +145,16 @@ class CustomerServiceTest {
     void willThrowExceptionWhenGetCustomerReturnsEmptyOptional() {
         // Given
         Integer customerId = 10;
+
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+        when(messageSource.getMessage("exception.customer.notFound", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         // Then
         assertThatThrownBy(() -> underTest.getCustomer(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+                .hasMessage("Exception message");
     }
 
     @Test
@@ -192,10 +207,13 @@ class CustomerServiceTest {
                 Gender.values()[RANDOM.nextInt(Gender.values().length)]
         );
 
+        when(messageSource.getMessage("exception.customer.notFound", null, Locale.getDefault()))
+                .thenReturn("Exception message");
+
         // When
         assertThatThrownBy(() -> underTest.updateCustomer(customerId, request))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+                .hasMessage("Exception message");
 
         // Then
         verify(customerRepository).findById(customerId);
@@ -221,12 +239,15 @@ class CustomerServiceTest {
                 null,
                 null,
                 null);
+
         when(customerRepository.existsCustomerByEmail(request.email())).thenReturn(true);
+        when(messageSource.getMessage("exception.authentication.emailAlreadyExists", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         assertThatThrownBy(() -> underTest.updateCustomer(customerId, request))
                 .isInstanceOf(DuplicateResourceException.class)
-                .hasMessage("Email already taken");
+                .hasMessage("Exception message");
         // Then
         verify(customerRepository, never()).save(any());
     }
@@ -387,10 +408,13 @@ class CustomerServiceTest {
                 customer.getGender()
         );
 
+        when(messageSource.getMessage("exception.customer.noChanges", null, Locale.getDefault()))
+                .thenReturn("Exception message");
+
         // When
         assertThatThrownBy(() -> underTest.updateCustomer(customerId, request))
                 .isInstanceOf(RequestValidationException.class)
-                .hasMessage("No data changes found");
+                .hasMessage("Exception message");
 
         // Then
         verify(customerRepository, never()).save(any());
@@ -413,12 +437,15 @@ class CustomerServiceTest {
     void willThrowExceptionWhenDeleteCustomerIfNotExists() {
         // Given
         Integer customerId = 1;
+
         when(customerRepository.existsCustomerById(customerId)).thenReturn(false);
+        when(messageSource.getMessage("exception.customer.notFound", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         assertThatThrownBy(() -> underTest.deleteCustomer(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+                .hasMessage("Exception message");
 
         // Then
         verify(customerRepository, never()).deleteById(customerId);
@@ -469,11 +496,13 @@ class CustomerServiceTest {
         MultipartFile multipartFile = new MockMultipartFile("file.jpg", "Hello World".getBytes());
 
         when(customerRepository.findById(customerId)).thenReturn(Optional.empty());
+        when(messageSource.getMessage("exception.customer.notFound", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         assertThatThrownBy(() -> underTest.updateCustomerProfileImage(customerId, multipartFile))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Customer with id [%s] not found".formatted(customerId));
+                .hasMessage("Exception message");
 
         // Then
         verify(customerRepository).findById(customerId);
@@ -496,12 +525,14 @@ class CustomerServiceTest {
 
         MultipartFile multipartFile = mock(MultipartFile.class);
         when(multipartFile.getBytes()).thenThrow(IOException.class);
+        when(messageSource.getMessage("exception.customer.profileImage.notUploaded", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         assertThatThrownBy(() -> underTest.updateCustomerProfileImage(customerId, multipartFile))
                 .isInstanceOf(RuntimeException.class)
                 .hasRootCauseInstanceOf(IOException.class)
-                .hasMessage("Failed to upload profile image");
+                .hasMessage("Exception message");
 
         // Then
         verify(customerRepository, never()).save(any());
@@ -550,12 +581,14 @@ class CustomerServiceTest {
                 new Customer(customerId, name, email, password, age, gender);
 
         when(customerRepository.findById(customerId)).thenReturn(Optional.of(customer));
+        when(messageSource.getMessage("exception.customer.profileImage.notFound", null, Locale.getDefault()))
+                .thenReturn("Exception message");
 
         // When
         // Then
         assertThatThrownBy(() -> underTest.getCustomerProfileImage(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("Customer profile image not found");
+                .hasMessage("Exception message");
 
         verifyNoInteractions(fileStorageService);
     }
