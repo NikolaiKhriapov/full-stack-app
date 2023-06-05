@@ -256,4 +256,4 @@ dist-ssr
 *.sw?
 /backend/src/test/resources/garbage/*
 /backend/.env
-/frontend/vite-project/.env
+/frontend/frontend/.env
