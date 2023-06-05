@@ -29,7 +29,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersTest {
     }
 
     @Test
-    void existsCustomerByEmail() {
+    void testExistsCustomerByEmail() {
         String email = FAKER.internet().safeEmailAddress() + "-" + UUID.randomUUID();
         Customer customer = new Customer(
                 FAKER.name().fullName(),
@@ -47,7 +47,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersTest {
     }
 
     @Test
-    void existsCustomerByEmailFailsWhenEmailNotPresent() {
+    void testExistsCustomerByEmailException() {
         String email = FAKER.internet().safeEmailAddress() + "-" + UUID.randomUUID();
 
         var actual = underTest.existsCustomerByEmail(email);
@@ -56,7 +56,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersTest {
     }
 
     @Test
-    void existsCustomerById() {
+    void testExistsCustomerById() {
         String email = FAKER.internet().safeEmailAddress() + "-" + UUID.randomUUID();
         Customer customer = new Customer(
                 FAKER.name().fullName(),
@@ -81,7 +81,7 @@ class CustomerRepositoryTest extends AbstractTestcontainersTest {
     }
 
     @Test
-    void existsCustomerByIdFailsWhenIdNotPresent() {
+    void testExistsCustomerByIdException() {
         Integer customerId = -1;
 
         var actual = underTest.existsCustomerById(customerId);

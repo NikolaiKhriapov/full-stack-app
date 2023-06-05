@@ -135,15 +135,14 @@ public class CustomerService {
         customerRepository.save(customer);
     }
 
-    // TODO: cover with tests
-    private void deleteCustomerProfileImage(Customer customer) {
+    void deleteCustomerProfileImage(Customer customer) {
         if (customer.getProfileImage() != null) {
             try {
                 Path oldCustomerProfileImage = Path.of(customer.getProfileImage());
                 Files.delete(oldCustomerProfileImage);
                 customer.setProfileImage(null);
             } catch (IOException e) {
-                throw new RuntimeException(e); // TODO: handle
+                throw new RuntimeException("File not found");
             }
         }
     }

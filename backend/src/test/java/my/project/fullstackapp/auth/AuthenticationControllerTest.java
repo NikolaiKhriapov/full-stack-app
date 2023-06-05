@@ -36,7 +36,7 @@ public class AuthenticationControllerTest {
     private final Random RANDOM = new Random();
 
     @Test
-    void login() {
+    void testLogin() {
         // create registration request
         Name fakerName = FAKER.name();
         String name = fakerName.fullName();

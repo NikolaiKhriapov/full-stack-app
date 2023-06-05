@@ -36,7 +36,7 @@ class CustomerControllerTest {
     private final Random RANDOM = new Random();
 
     @Test
-    void registerCustomer() {
+    void testRegisterCustomer() {
         // create registration request
         Name fakerName = FAKER.name();
         String name = fakerName.fullName();
@@ -94,7 +94,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void updateCustomer() {
+    void testUpdateCustomer() {
         // create registration request
         Name fakerName = FAKER.name();
         String name = fakerName.fullName();
@@ -168,7 +168,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void deleteCustomer() {
+    void testDeleteCustomer() {
         // create registration request
         Name fakerName = FAKER.name();
         String name = fakerName.fullName();
@@ -237,7 +237,7 @@ class CustomerControllerTest {
     }
 
     @Test
-    void updateCustomerProfileImage_getCustomerProfileImage() throws IOException {
+    void testUpdateCustomerProfileImage_getCustomerProfileImage() throws IOException {
         // Given
         // create registration request
         Name fakerName = FAKER.name();

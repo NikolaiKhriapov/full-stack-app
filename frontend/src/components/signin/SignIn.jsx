@@ -9,9 +9,6 @@ import {useNavigate} from "react-router-dom";
 import {useEffect} from "react";
 
 const MyTextInput = ({label, ...props}) => {
-    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
-    // which we can spread on <input>. We can use field meta to show an error
-    // message if the field is invalid and it has been touched (i.e. visited)
     const [field, meta] = useField(props);
     return (
         <Box>
@@ -87,7 +84,6 @@ const SignInForm = () => {
 }
 
 const SignIn = () => {
-
     const {customer} = useAuth();
     const navigate = useNavigate();
 

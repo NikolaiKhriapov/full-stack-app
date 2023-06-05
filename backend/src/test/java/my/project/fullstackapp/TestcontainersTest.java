@@ -7,9 +7,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestcontainersTest extends AbstractTestcontainersTest {
 
     @Test
-    void canStartPostgresDB() {
+    void testStartPostgresDB() {
         assertThat(postgreSQLContainer.isRunning()).isTrue();
         assertThat(postgreSQLContainer.isCreated()).isTrue();
-//        assertThat(postgreSQLContainer.isHealthy()).isTrue();
     }
 }

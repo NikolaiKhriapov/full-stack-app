@@ -5,9 +5,6 @@ import {createCustomer} from "../services/client.js";
 import {successNotification, errorNotification} from "../services/notification.js";
 
 const MyTextInput = ({label, ...props}) => {
-    // useField() returns [formik.getFieldProps(), formik.getFieldMeta()]
-    // which we can spread on <input>. We can use field meta to show an error
-    // message if the field is invalid and it has been touched (i.e. visited)
     const [field, meta] = useField(props);
     return (
         <Box>
@@ -39,7 +36,6 @@ const MySelect = ({label, ...props}) => {
     );
 };
 
-// And now we can use these
 const CreateCustomerForm = ({onSuccess}) => {
     return (
         <>

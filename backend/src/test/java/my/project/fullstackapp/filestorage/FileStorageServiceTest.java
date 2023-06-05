@@ -35,7 +35,7 @@ class FileStorageServiceTest {
     }
 
     @Test
-    void getProfileImage() throws IOException {
+    void testGetProfileImage() throws IOException {
         // Given
         when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
         when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
@@ -59,7 +59,7 @@ class FileStorageServiceTest {
     }
 
     @Test
-    void willThrowExceptionWhenGetProfileImage() {
+    void testGetProfileImage_Exception_CannotReadBytes() {
         // Given
         when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
         when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
@@ -83,7 +83,7 @@ class FileStorageServiceTest {
     }
 
     @Test
-    void putProfileImage() throws IOException {
+    void testPutProfileImage() throws IOException {
         // Given
         when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
         when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
@@ -104,7 +104,7 @@ class FileStorageServiceTest {
     }
 
     @Test
-    void willThrowExceptionWhenPutProfileImageCreateDirectories() {
+    void testPutProfileImage_Exception_DirectoryNotFound() {
         // Given
         when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
         when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
@@ -128,7 +128,7 @@ class FileStorageServiceTest {
     }
 
     @Test
-    void willThrowExceptionWhenPutProfileImageWrite() {
+    void testPutProfileImage_Exception_FileNotFound() {
         // Given
         when(fileStorageProperties.getProfileImageDirectory()).thenReturn(PROFILE_IMAGE_DIRECTORY);
         when(fileStorageProperties.getProfileImageName()).thenReturn(PROFILE_IMAGE_NAME);
