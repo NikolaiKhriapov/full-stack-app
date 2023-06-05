@@ -1,5 +1,5 @@
 services:
-  db:
+  database:
     container_name: full-stack-app-database
     image: postgres:15.1
     environment:
@@ -8,38 +8,38 @@ services:
       POSTGRES_PASSWORD: 1478236950
       PGDATA: /data/postgres
     volumes:
-      - db:/data/postgres
+      - database:/data/postgres
     ports:
       - "5433:5432"
     networks:
-      - db
+      - database
     restart: unless-stopped
-  full-stack-app-api:
+  full-stack-app-backend:
     container_name: full-stack-app-backend
-    image: kolyakhryapov/full-stack-app-api
+    image: kolyakhryapov/full-stack-app-backend
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/customer
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/customer
     ports:
       - "8080:8081"
     networks:
-      - db
+      - database
     depends_on:
-      - db
+      - database
     restart: unless-stopped
-  full-stack-app-react:
+  full-stack-app-frontend:
     container_name: full-stack-app-frontend
-    image: kolyakhryapov/full-stack-app-react
+    image: kolyakhryapov/full-stack-app-frontend
     build:
       context: frontend/vite-project
     ports:
       - "3000:5173"
     depends_on:
-      - full-stack-app-api
+      - full-stack-app-backend
     restart: unless-stopped
 
 networks:
-  db:
+  database:
     driver: bridge
 
 volumes:
-  db:
+  database:
